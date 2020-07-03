@@ -36,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
        //Set buffer settings
        DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder()
                .setBufferDurationsMs(
-                       1000,
-                       2500,
-                       1000,
-                       1000
+                       500,
+                       DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+                       500,
+                       500
                );
 
         //Set track parameters
@@ -47,10 +47,8 @@ public class MainActivity extends AppCompatActivity {
         trackSelector.setParameters(
                 trackSelector
                         .buildUponParameters()
-                        .setMaxVideoSize(1280,720)
         .setForceLowestBitrate(true)
         );
-
 
         //Create the player
         player =  new SimpleExoPlayer.Builder(this)
@@ -65,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         // start play automatically when player is ready.
         player.setPlayWhenReady(true);
 
-        changeChannel("udp://@239.1.3.1:1234");
+        changeChannel("udp://@239.1.1.1:1234");
     }
 
     private void changeChannel(String url){
@@ -91,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
             else if(event.getKeyCode() == 20)
                 ip=ip-1;
 
-            changeChannel("udp://@239.1.3."+ip+":1234");
+            changeChannel("udp://@239.1.1."+ip+":1234");
         }
 
         return super.dispatchKeyEvent(event);
