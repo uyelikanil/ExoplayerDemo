@@ -2,22 +2,19 @@ package com.playroomtv.exoplayerdemo;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Player.EventListener {
 
     PlayerView playerView;
     private SimpleExoPlayer player;
@@ -93,5 +90,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+        Toast.makeText(this, "onPlayerError: "+error.type, Toast.LENGTH_SHORT).show();
     }
 }
