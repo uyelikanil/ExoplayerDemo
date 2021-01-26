@@ -30,14 +30,15 @@ public class MainActivity extends AppCompatActivity implements Player.EventListe
     }
 
     private void initPlayer(){
-       //Set buffer settings
+       // Set buffer settings
        DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder()
                .setBufferDurationsMs(
-                       500,
+                       50,
                        DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
-                       500,
-                       500
-               );
+                       50,
+                       50
+               )
+               .setBackBuffer(50,true);
 
         //Set track parameters
         DefaultTrackSelector trackSelector = new DefaultTrackSelector(this);
@@ -49,10 +50,9 @@ public class MainActivity extends AppCompatActivity implements Player.EventListe
 
         //Create the player
         player =  new SimpleExoPlayer.Builder(this)
-                .setLoadControl(loadControl.createDefaultLoadControl())
+                .setLoadControl(loadControl.build())
                 .setTrackSelector(trackSelector)
                 .build();
-
 
         // set player in playerView
         playerView.setPlayer(player);
@@ -63,19 +63,13 @@ public class MainActivity extends AppCompatActivity implements Player.EventListe
         changeChannel("udp://@239.1.1.1:1234");
     }
 
+    // Changes media
     private void changeChannel(String url){
         if (url.isEmpty())
             Toast.makeText(this,"Please enter a url",Toast.LENGTH_SHORT).show();
-        Uri videoUri = Uri.parse(url);
 
-        // Create a data source factory.
-        DataSource.Factory dataSourceFactory =
-                new DefaultDataSourceFactory(this,Util.getUserAgent(this,getPackageName()));
-        // Create a SmoothStreaming media source pointing to a manifest uri.
-        MediaSource mediaSource =
-                new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(videoUri);
-        player.prepare(mediaSource);
-
+        player.setMediaItem(MediaItem.fromUri(url));
+        player.prepare();
     }
 
     @Override
