@@ -74,13 +74,18 @@ public class MainActivity extends AppCompatActivity implements Player.EventListe
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if(event.getAction() == KeyEvent.ACTION_DOWN){
-            if(event.getKeyCode() == 19)
-                ip=ip+1;
-            else if(event.getKeyCode() == 20)
-                ip=ip-1;
-
-            changeChannel("udp://@239.1.1."+ip+":1234");
+        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+            if(event.getKeyCode() == 19) {
+                if(ip > 8)
+                    return false;
+                ip = ip + 1;
+                changeChannel("udp://@239.1.1."+ip+":1234");
+            } else if(event.getKeyCode() == 20) {
+                if(ip == 1)
+                    return false;
+                ip = ip - 1;
+                changeChannel("udp://@239.1.1."+ip+":1234");
+            }
         }
 
         return super.dispatchKeyEvent(event);
