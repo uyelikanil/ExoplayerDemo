@@ -5,12 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.opengl.EGL14;
 import android.opengl.GLES20;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -19,12 +16,8 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.audio.AudioAttributes;
-import com.google.android.exoplayer2.audio.AudioListener;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.video.DummySurface;
-import com.google.android.exoplayer2.video.VideoListener;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -34,99 +27,91 @@ import javax.microedition.khronos.egl.EGLSurface;
 
 public class MainActivity extends AppCompatActivity implements Player.EventListener {
 
-    View shutter;
-    PlayerView playerView;
+    private PlayerView playerView;
     private SimpleExoPlayer player;
-
-    int ip = 1;
+    private int ip = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         playerView = findViewById(R.id.playerView);
-        shutter = findViewById(R.id.exo_shutter);
-
-        changeChannel("udp://@239.1.1.1:1234");
     }
 
     // Changes media
     private void changeChannel(String url){
-        if (url.isEmpty())
-            Toast.makeText(this,"Please enter a url",Toast.LENGTH_SHORT).show();
-
-        // Clear surface
-        if(player!=null) {
-            player.stop();
-            player.release();
-            clearSurface();
+        if (url.isEmpty()) {
+            Toast.makeText(this, "Please enter a url", Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        // Clear surface
+        clearPlayerSurface();
+        // Set player
+        setPlayer();
+        // Set media
+        setMedia(url);
+    }
+
+    // Sets player
+    private void setPlayer() {
         // Set buffer settings
         DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder()
                 .setBufferDurationsMs(
                         DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
                         DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
-                        0,
-                        0
+                        DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS/2,
+                        DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS/2
                 )
-                .setBackBuffer(0,false);
-        //Set track parameters
+                .setBackBuffer(DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS,false);
+
+        // Set track parameters
         DefaultTrackSelector trackSelector = new DefaultTrackSelector(this);
         trackSelector.setParameters(
                 trackSelector
                         .buildUponParameters()
-                        .setExceedRendererCapabilitiesIfNecessary(true)
         );
 
+        // Set default renderer
         DefaultRenderersFactory defaultRenderersFactory = new DefaultRenderersFactory(this);
         defaultRenderersFactory.setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
-        defaultRenderersFactory.setAllowedVideoJoiningTimeMs(0);
 
         // Create the player
         player =  new SimpleExoPlayer.Builder(this,defaultRenderersFactory)
                 .setLoadControl(loadControl.build())
                 .setTrackSelector(trackSelector)
+                .setUseLazyPreparation(true)
+                .setReleaseTimeoutMs(250)
+                .setDetachSurfaceTimeoutMs(0)
                 .build();
+        player.addListener(this);
         player.setPlayWhenReady(true);
 
-        // set player in playerView
+        // Set player in playerView
         playerView.setPlayer(player);
         playerView.requestFocus();
         playerView.setKeepContentOnPlayerReset(false);
+    }
 
-        // Per MediaItem settings.
+    // Sets media
+    private void setMedia(String url) {
         MediaItem mediaItem =
                 new MediaItem.Builder()
                         .setUri(url)
                         .build();
-
         player.setMediaItem(mediaItem);
         player.prepare();
     }
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if(event.getAction() == KeyEvent.ACTION_DOWN) {
-            if(event.getKeyCode() == 19) {
-                if(ip > 8)
-                    return false;
-                ip = ip + 1;
-                changeChannel("udp://@239.1.1."+ip+":1234");
-            } else if(event.getKeyCode() == 20) {
-                if(ip == 1)
-                    return false;
-                ip = ip - 1;
-                changeChannel("udp://@239.1.1."+ip+":1234");
-            }
+    // Clears player's surface
+    private void clearPlayerSurface() {
+        if(player!=null) {
+            player.release();
+            clearSurface();
         }
-
-        return super.dispatchKeyEvent(event);
     }
 
-    /**
-     * Clears video view's surface
-     */
+    // Clears video view's surface
     public void clearSurface() {
         SurfaceView surfaceView = (SurfaceView) playerView.getVideoSurfaceView();
         Surface surface = surfaceView.getHolder().getSurface();
@@ -173,5 +158,31 @@ public class MainActivity extends AppCompatActivity implements Player.EventListe
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         Toast.makeText(this, "onPlayerError: "+error.type, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+            if(event.getKeyCode() == 19) {
+                if(ip > 8)
+                    return false;
+                ip = ip + 1;
+                changeChannel("udp://@239.1.1."+ip+":1234");
+            } else if(event.getKeyCode() == 20) {
+                if(ip == 1)
+                    return false;
+                ip = ip - 1;
+                changeChannel("udp://@239.1.1."+ip+":1234");
+            }
+        }
+
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        changeChannel("udp://@239.1.1."+ip+":1234");
     }
 }
