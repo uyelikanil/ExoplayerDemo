@@ -33,6 +33,7 @@ public class ExoPlayer implements AnalyticsListener {
     private final Context context;
     public SimpleExoPlayer exoPlayer;
     public PlayerView playerView;
+    public DefaultTrackSelector trackSelector;
 
     public ExoPlayer(Context context, PlayerView playerView) {
         this.context = context;
@@ -54,7 +55,7 @@ public class ExoPlayer implements AnalyticsListener {
                 .setBackBuffer(DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS, false);
 
         // Set track parameters
-        DefaultTrackSelector trackSelector = new DefaultTrackSelector(context);
+        trackSelector = new DefaultTrackSelector(context);
         trackSelector.setParameters(
                 trackSelector
                         .buildUponParameters()
