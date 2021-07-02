@@ -9,11 +9,11 @@ import android.widget.CompoundButton;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.DefaultTrackNameProvider;
 import com.google.android.exoplayer2.ui.TrackNameProvider;
-import com.playroomtv.exoplayerdemo.utilities.TrackConst;
 import com.playroomtv.exoplayerdemo.databinding.TrackCardviewBinding;
 
 public class TrackSelectorRecyclerViewHolder extends RecyclerView.ViewHolder {
@@ -47,12 +47,12 @@ public class TrackSelectorRecyclerViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
-                    if(trackType == TrackConst.TRACK_AUDIO) {
+                    if(trackType == C.TRACK_TYPE_AUDIO) {
                         trackSelectorRecyclerViewAdapter.defaultTrackSelector.setParameters(
                                 trackSelectorRecyclerViewAdapter.defaultTrackSelector
                                         .buildUponParameters()
                                         .setPreferredAudioLanguage(format.language));
-                    } else if(trackType == TrackConst.TRACK_SUBTITLE) {
+                    } else if(trackType == C.TRACK_TYPE_TEXT) {
                         trackSelectorRecyclerViewAdapter.defaultTrackSelector.setParameters(
                                 trackSelectorRecyclerViewAdapter.defaultTrackSelector
                                         .buildUponParameters()

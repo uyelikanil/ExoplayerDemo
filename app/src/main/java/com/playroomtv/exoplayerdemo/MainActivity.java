@@ -9,13 +9,12 @@ import android.widget.Toast;
 
 import com.google.android.exoplayer2.Player;
 import com.playroomtv.exoplayerdemo.databinding.ActivityMainBinding;
+import com.playroomtv.exoplayerdemo.utilities.MediaConst;
 
 public class MainActivity extends AppCompatActivity{
-
     private ActivityMainBinding binding;
     private ExoPlayer player;
     private int ip = 1;
-    private final String brokenMediaIp = "udp://@239.1.10.5:1234";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +28,12 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if(event.getAction() == KeyEvent.ACTION_DOWN) {
-            if(event.getKeyCode() == 19) {
+            if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
                 if(ip > 8)
                     return false;
                 ip = ip + 1;
                 player.changeMedia("udp://@239.1.1."+ip+":1234");
-            } else if(event.getKeyCode() == 20) {
+            } else if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
                 if(ip == 1)
                     return false;
                 ip = ip - 1;
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onStart() {
         super.onStart();
 
-        player.changeMedia(brokenMediaIp);
+        player.changeMedia(MediaConst.MEDIA_URL);
     }
 
     @Override

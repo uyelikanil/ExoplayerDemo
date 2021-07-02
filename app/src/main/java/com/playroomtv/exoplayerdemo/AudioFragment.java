@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.TrackGroup;
@@ -16,7 +17,6 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.playroomtv.exoplayerdemo.adapter.TrackSelectorRecyclerViewAdapter;
 import com.playroomtv.exoplayerdemo.databinding.FragmentAudioBinding;
-import com.playroomtv.exoplayerdemo.utilities.TrackConst;
 
 import java.util.ArrayList;
 
@@ -49,13 +49,13 @@ public class AudioFragment extends Fragment {
         recyclerViewItems = new ArrayList<>();
         recyclerViewAdapter = new TrackSelectorRecyclerViewAdapter(
                 new TrackSelectorRecyclerViewAdapter.TrackDiff(),
-                getActivity(), player, trackSelector, TrackConst.TRACK_AUDIO);
+                getActivity(), player, trackSelector, C.TRACK_TYPE_AUDIO);
         binding.recyclerView.setAdapter(recyclerViewAdapter);
     }
 
     private void list() {
         MappingTrackSelector.MappedTrackInfo mappedInfoTrack = trackSelector.getCurrentMappedTrackInfo();
-        TrackGroupArray trackGroups = mappedInfoTrack.getTrackGroups(TrackConst.TRACK_AUDIO);
+        TrackGroupArray trackGroups = mappedInfoTrack.getTrackGroups(C.TRACK_TYPE_AUDIO);
 
         for (int groupIndex = 0; groupIndex < trackGroups.length; groupIndex++)
         {
